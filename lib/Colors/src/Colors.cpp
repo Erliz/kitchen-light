@@ -33,7 +33,7 @@ Colors::Colors(int pin, String color, int step)
   _migrationShiftCount = 0;
   _migrationMaxShiftCount = 100;
   _migrationTickCount = 0;
-  _migrationDelay = 500;
+  _migrationDelay = 30;
 
   _isMigrating = false;
   _isPulseDone = true;
@@ -75,6 +75,9 @@ int Colors::getWantedValue() {
 
 void Colors::wantValue(int value) {
   // Serial.print("Whant :");Serial.println(value);
+  _migrationFrom = _currentValue;
+  _migrationShiftCount = 0;
+  _isMigrating = true;
   _wantedValue = value;
 }
 
@@ -83,11 +86,7 @@ void Colors::migrate() {
     _isMigrating = false;
     return;
   }
-  if (!_isMigrating) {
-    _migrationFrom = _currentValue;
-    _migrationShiftCount = 0;
-  }
-  _isMigrating = true;
+
   if (_migrationTickCount == 0 || _migrationTickCount % _migrationDelay != 0) {
     _migrationTickCount++;
     return;
@@ -101,6 +100,9 @@ void Colors::migrate() {
   } else {
     newValue = abs(_currentValue - (float)(_migrationFrom - _wantedValue) / _migrationMaxShiftCount);
   }
+  // Serial.print(getColor());Serial.print(" wanted ");Serial.println(getWantedValue());
+  // Serial.print(getColor());Serial.print(" shift count ");Serial.println(_migrationShiftCount);
+  // Serial.print(getColor());Serial.print(" diff from-wanted ");Serial.println((float)(_migrationFrom - _wantedValue));
   // Serial.print(getColor());Serial.print(" migrate ");Serial.println(newValue);
 
   setValue(newValue);

@@ -10,9 +10,11 @@ const unsigned int greenLedPin = 11;
 const unsigned int blueLedPin = 9;
 
 const unsigned int glowSec = 60;
+// const unsigned int glowSec = 40;
 const unsigned int forceGlowSec = 600;
-const unsigned int lightThresholdValue = 10;
+const unsigned int lightThresholdValue = 20;
 const unsigned int delaySec = 1;
+// const unsigned int delaySec = 0.1;
 const uint8_t PROGMEM GAMMA[] = {
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,
     0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  1,  1,  1,  1,
@@ -99,19 +101,22 @@ void turnStripOff() {
   // analogWrite(redLedPin, 0);
   // analogWrite(greenLedPin, 0);
   // analogWrite(blueLedPin, 0);
-  RedColor.wantValue(0);
-  GreenColor.wantValue(0);
-  BlueColor.wantValue(0);
+  // writeLedValue(redLedPin, 0);
+  // writeLedValue(greenLedPin, 0);
+  // writeLedValue(blueLedPin, 0);
+  RedColor.wantValue(1);
+  GreenColor.wantValue(1);
+  BlueColor.wantValue(1);
 }
 
 void turnLigthOff() {
   if (isLigthOn) {
     digitalWrite(ledPin, LOW);
     turnStripOff();
-    Serial.println("Turn ligth off");
+    // Serial.println("Turn ligth off");
     isLigthOn = false;
   } else {
-    Serial.println("Ligth already turned off");
+    // Serial.println("Ligth already turned off");
   }
 }
 
@@ -119,15 +124,15 @@ void turnLigthOn() {
   if (!isLigthOn) {
     digitalWrite(ledPin, HIGH);
     turnStripOn();
-    Serial.println("Turn ligth on");
+    // Serial.println("Turn ligth on");
     isLigthOn = true;
   } else {
-    Serial.println("Ligth already turned on");
+    // Serial.println("Ligth already turned on");
   }
 }
 
 bool setTurnOffTime(unsigned int sec) {
-  Serial.print("Remaining time: ");Serial.println(getRemainGlowTime());
+  // Serial.print("Remaining time: ");Serial.println(getRemainGlowTime());
   if (getRemainGlowTime() < sec) {
     turnOffTime = now() + sec;
     return true;
@@ -145,15 +150,16 @@ void forceTurnLigthOn() {
 }
 
 void tick() {
-  if (RedColor.isMigrating() && GreenColor.isMigrating() && BlueColor.isMigrating()) {
+  // if (RedColor.isMigrating() || GreenColor.isMigrating() || BlueColor.isMigrating()) {
+    // Serial.println("Tick!");
     RedColor.tick(false);
     GreenColor.tick(false);
     BlueColor.tick(false);
-  }
+  // }
 }
 
 void setup() {
-  Serial.begin(9600);
+  // Serial.begin(9600);
   pinMode(motionSensorPin, INPUT);
   pinMode(ligthSensorPin, INPUT);
   pinMode(buttonPin, INPUT);
@@ -168,15 +174,12 @@ void loop() {
   unsigned int buttonValue = digitalRead(buttonPin);  //Read the analog value
   int motionSensorValue = digitalRead(motionSensorPin);  //Read the analog value
   // Serial.print("Millis: ");Serial.println(millis());
-  Serial.print("Motion sensor value: ");Serial.println(motionSensorValue);
-  Serial.print("Ligth sensor value: ");Serial.println(ligthSensorValue);
-  Serial.print("Button value: ");Serial.println(buttonValue);
+  // Serial.print("Motion sensor value: ");Serial.println(motionSensorValue);
+  // Serial.print("Ligth sensor value: ");Serial.println(ligthSensorValue);
+  // Serial.print("Button value: ");Serial.println(buttonValue);
   if (buttonValue == HIGH) {
     forceTurnLigthOn();
-  } else if (motionSensorValue == HIGH) {
-    updateTurnOffTime();
-    turnLigthOn();
-  } else if (ligthSensorValue <= lightThresholdValue){
+  } else if (motionSensorValue == HIGH && ligthSensorValue <= lightThresholdValue) {
     updateTurnOffTime();
     turnLigthOn();
   }
@@ -184,9 +187,9 @@ void loop() {
     if (isTimeToTurnOff()) {
       turnLigthOff();
     } else {
-      Serial.print("Turn ligth off after: ");Serial.println(getRemainGlowTime());
+      // Serial.print("Turn ligth off after: ");Serial.println(getRemainGlowTime());
     }
   }
   tick();
-  delay(delaySec * 1000);
+  // delay(delaySec * 1000);
 }
